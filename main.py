@@ -1,7 +1,7 @@
 import requests
 import lxml
+from popup import Popup
 from bs4 import BeautifulSoup
-from pprint import pprint
 
 product_name = ""
 product_url = "https://www.amazon.ca/Mercer-Culinary-10-Inch-Forged-Chefs/dp/B000OOLD26/ref=sr_1_" \
@@ -14,10 +14,20 @@ headers = {
     'accept-encoding': 'gzip, deflate'
 }
 
-search_price = int
+search_price = 60.99
 
 response = requests.get(url=product_url, headers=headers).text
 
 soup = BeautifulSoup(response, 'lxml')
 
-pprint(soup)
+product_name = soup.find(name='span', class_="a-size-large product-title-word-break").getText().strip("\n")
+price = soup.find(name='span', class_='a-size-medium a-color-price priceBlockBuyingPriceString').getText()
+price = float(price.strip('CDN$\xa0'))
+
+
+if price <= search_price:
+    _popup = Popup(product_name, price)
+
+    _popup.window.mainloop()
+else:
+    print("No price adjustment.")
